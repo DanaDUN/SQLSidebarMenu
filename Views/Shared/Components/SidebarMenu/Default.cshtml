@@ -1,0 +1,106 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model List<SidebarTreeViewModel>
+
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<!-- 原版本
+@* 
+<ul class="sidebar-menu">
+    @foreach (var item in Model)
+    {
+        <li>
+            <span>@item.Title</span>
+
+            @if (item.Children?.Any() == true)
+            {
+                <ul>
+                    @foreach (var child in item.Children)
+                    {
+                        <li>
+                            @Html.ActionLink(child.Title, "Index", child.Form)
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+    }
+</ul> 
+*@
+-->
+
+<!-- 美化版本
+@*
+<ul class="list-unstyled ps-0">
+
+    @foreach (var item in Model)
+    {
+        <li class="mb-1">
+            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                    data-bs-toggle="collapse" data-bs-target="#@item.Form-collapse" aria-expanded="false">
+                @item.Title
+            </button>
+
+            <div class="collapse" id="@item.Form-collapse">
+
+                @if (item.Children?.Any() == true)
+                {
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+
+                        @foreach (var child in item.Children)
+                        {
+                            <li class="nav-item">
+                                <a class="link-body-emphasis d-inline-flex text-decoration-none rounded" asp-controller="@child.Form" asp-action="Index">@child.Title</a>
+                            </li>
+                        }
+
+                    </ul>
+                }
+
+            </div>
+        </li>
+    }
+
+</ul>
+*@
+-->
+
+<!-- 記憶目前位置版本 -->
+<ul class="sidebar-menu list-unstyled ps-0">
+
+    @foreach (var item in Model)
+    {
+        var isActiveGroup = item.Children.Any(c => c.Form == currentController);
+
+        <li class="mb-1">
+            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 @(isActiveGroup ? "" : "collapsed")"
+                    data-bs-toggle="collapse" data-bs-target="#@item.Form-collapse" aria-expanded="@(isActiveGroup.ToString().ToLower())">
+                @item.Title
+            </button>
+
+            <div class="collapse @(isActiveGroup ? "show" : "")" id="@item.Form-collapse">
+
+                @if (item.Children?.Any() == true)
+                {
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+
+                        @foreach (var child in item.Children)
+                        {
+                            var isActive = child.Form == currentController;
+                            <li class="nav-item">
+                                <a class="link-body-emphasis d-inline-flex text-decoration-none rounded @(isActive ? "active" : "")"
+                                   asp-controller="@child.Form" asp-action="Index">
+                                    @child.Title
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+                }
+
+            </div>
+        </li>
+    }
+
+</ul>
